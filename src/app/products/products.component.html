@@ -1,0 +1,99 @@
+<div class="mat-elevation-z8">
+  <table mat-table class="full-width-table" matSort aria-label="Elements">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Article</th>
+      <td mat-cell *matCellDef="let row">
+        <ng-container *ngIf="editingColumnName === 'name-' + row.id; else nameEdition">
+          <mat-form-field>
+            <input matInput [(ngModel)]="row.name"
+                   type="text"
+                   required
+                   placeholder="">
+          </mat-form-field> <button mat-mini-fab (click)="save(row.id, 'name', row.name)" [disabled]="loadingActions">
+            <mat-icon matTooltip="Enregistrer">save</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #nameEdition>
+          {{row.name}} <button *ngIf="isMe(row.owner.email)" mat-mini-fab color="accent" (click)="activeEdit(row.id, 'name')" [disabled]="!!editingColumnName">
+            <mat-icon matTooltip="Modifier le nom de l'article">edit</mat-icon>
+          </button>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="quantity">
+      <th mat-header-cell *matHeaderCellDef>Quantité</th>
+      <td mat-cell *matCellDef="let row">
+        <ng-container *ngIf="editingColumnName === 'quantity-' + row.id; else quantityEdition">
+          <mat-form-field>
+            <input matInput [(ngModel)]="row.quantity"
+                   type="number"
+                   required
+                   placeholder="">
+          </mat-form-field> <button mat-mini-fab (click)="save(row.id, 'quantity', row.quantity)" [disabled]="loadingActions">
+            <mat-icon matTooltip="Enregistrer">save</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #quantityEdition>
+          {{row.quantity}} <button *ngIf="isMe(row.owner.email)" mat-mini-fab color="accent" (click)="activeEdit(row.id, 'quantity')" [disabled]="!!editingColumnName">
+            <mat-icon matTooltip="Modifier le nom de l'article">edit</mat-icon>
+          </button>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="owner">
+      <th mat-header-cell *matHeaderCellDef>Auteur</th>
+      <td mat-cell *matCellDef="let row">
+        {{isMe(row.owner.email) ? 'Moi' : row.owner.email}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="sharedUser">
+      <th mat-header-cell *matHeaderCellDef>Utilisateur partagé</th>
+      <td mat-cell *matCellDef="let row">
+        <ng-container *ngIf="editingColumnName === 'sharedUser-' + row.id; else sharedUserEdition">
+          <mat-form-field>
+            <mat-select #sharedUserSelect [value]="row.sharedUser ? row.sharedUser['@id'] : null">
+              <mat-option>Personne</mat-option>
+              <ng-container *ngFor="let user of allUsers">
+                <mat-option *ngIf="user.email !== row.owner.email" [value]="user['@id']">{{user.email}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field> <button mat-mini-fab (click)="save(row.id,'sharedUser', sharedUserSelect.value)" [disabled]="loadingActions">
+            <mat-icon matTooltip="Enregistrer">save</mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #sharedUserEdition>
+          {{ (isMe(row.sharedUser?.email) ? 'Moi' : row.sharedUser?.email) || 'Personne'}} <button *ngIf="isMe(row.owner.email)" mat-mini-fab color="accent" (click)="activeEdit(row.id, 'sharedUser')" [disabled]="!!editingColumnName">
+            <mat-icon matTooltip="Partager cet article">edit</mat-icon>
+          </button>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>
+        <button mat-mini-fab color="primary" (click)="add()" [disabled]="loadingActions">
+          <mat-icon matTooltip="Ajouter un nouvel article">add</mat-icon>
+        </button></th>
+      <td mat-cell *matCellDef="let row">
+        <div *ngIf="isMe(row.owner.email)">
+          <button mat-mini-fab color="warn" (click)="delete(row.id)" [disabled]="loadingActions">
+            <mat-icon matTooltip="Supprimer cet article">delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator
+      [length]="dataSource?.total"
+      [pageIndex]="0"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]">
+  </mat-paginator>
+</div>

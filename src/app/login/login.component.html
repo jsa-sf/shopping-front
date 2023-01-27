@@ -1,0 +1,36 @@
+<form [formGroup]="loginForm" novalidate (ngSubmit)="submit()">
+  <mat-card class="shipping-card">
+    <mat-card-header>
+      <mat-card-title>Renseignez vos identifiants</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="row">
+        <div class="col">
+          <mat-form-field class="full-width">
+            <input matInput placeholder="Email" formControlName="username">
+            <mat-error *ngIf="loginForm.controls['username'].hasError('required')">
+              L'email <strong>est non valide</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col">
+          <mat-form-field class="full-width">
+            <input matInput placeholder="Mot de passe" formControlName="password" type="password">
+            <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
+              Le mot de passe est <strong>vide</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+        <mat-spinner [diameter]="30" *ngIf="loading; else connection"></mat-spinner>
+        <ng-template #connection>Connexion</ng-template>
+      </button>
+      <mat-error *ngIf="errorLoginMessage.length > 0">
+        {{errorLoginMessage}}
+      </mat-error>
+    </mat-card-actions>
+  </mat-card>
+</form>
